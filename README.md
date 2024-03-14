@@ -1,8 +1,8 @@
 # Test mailer project
 
-This is example async mailer. 
-Projected is implemented as 2 separate tasks, running in parallel.
-First task constantly checking new user emails, second task sending emails.
+This is example of async mailer. 
+Project is implemented as 2 separate tasks, running in parallel.
+First task constantly checking new user emails, second task is sending emails.
 If nothing left, tasks stop but restart every minute using cron.
 
 PHP 8.2+ required.
@@ -11,7 +11,7 @@ Set enough MySQL max_connections = MAX_PARALLEL_PROCESSES_COUNT/50 (200 connecti
 
 ### Usage
 
-Add correct database credentials to **config.php**, run 2 processes using console commands:
+Add correct database credentials to **config.php**, and run 2 processes using console commands:
 ```
 php mailer.php validate
 php mailer.php send
