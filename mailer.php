@@ -12,7 +12,7 @@ const MAX_PARALLEL_PROCESSES_COUNT = 10000;
 
 // CLI interface
 if (empty($argv[1]) || !in_array($argv[1], AVAILABLE_COMMANDS, true)) {
-    echo "Provide command: " . implode(', ', AVAILABLE_COMMANDS) ."\n";
+    echo "Provide command: " . implode(', ', AVAILABLE_COMMANDS) . "\n";
     exit(1);
 }
 
@@ -34,8 +34,8 @@ switch ($argv[1]) {
  */
 function check_email(string $email): int
 {
-    sleep(random_int(1,60));
-    return random_int(0,1);
+    sleep(random_int(1, 60));
+    return random_int(0, 1);
 }
 
 /**
@@ -44,7 +44,7 @@ function check_email(string $email): int
  */
 function send_email(string $from, string $to, string $text): void
 {
-    sleep(random_int(1,10));
+    sleep(random_int(1, 10));
 }
 
 /**
@@ -66,19 +66,18 @@ function validate(): void
           AND checked=0
           ");
 
-    process($list, static function (array $row): void
-        {
-            $result = check_email($row['email']);
+    process($list, static function (array $row): void {
+        $result = check_email($row['email']);
 
-            $mysqli = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE);
-            mysqli_query($mysqli, "
+        $mysqli = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE);
+        mysqli_query($mysqli, "
             UPDATE users
             SET checked=1, valid={$result}
             WHERE id={$row['id']}
             ");
 
-            mysqli_close($mysqli);
-        }
+        mysqli_close($mysqli);
+    }
     );
 
     echo "Validation finished\n";
@@ -101,16 +100,15 @@ function send(): void
         WHERE TIMESTAMPDIFF(DAY,now(),U.validts) IN (1,3) AND valid=1 AND M.validts IS NULL 
           ");
 
-    process($list, static function (array $row): void
-        {
-            $message = "{$row['username']}, your subscription is expiring soon";
-            send_email(FROM_EMAIL, $row['email'], $message);
+    process($list, static function (array $row): void {
+        $message = "{$row['username']}, your subscription is expiring soon";
+        send_email(FROM_EMAIL, $row['email'], $message);
 
-            $mysqli = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE);
-            mysqli_query($mysqli, "INSERT INTO mails VALUES ({$row['id']},'{$row['validts']}')");
+        $mysqli = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE);
+        mysqli_query($mysqli, "INSERT INTO mails VALUES ({$row['id']},'{$row['validts']}')");
 
-            mysqli_close($mysqli);
-        }
+        mysqli_close($mysqli);
+    }
     );
 
     echo "Sending finished\n";
@@ -131,7 +129,7 @@ function process(mysqli_result $rows, callable $processor): void
 
         if ($pid === -1) {
             die('Unable to fork process.');
-        } elseif ($pid == 0) {
+        } elseif ($pid === 0) {
             $processor($row);
             exit();
         } else {
@@ -139,6 +137,7 @@ function process(mysqli_result $rows, callable $processor): void
         }
 
         // Keep max number of processes
+        // TODO: we can fasten processing here, if we will check all tasks and clear array from completed
         while (count($tasks) >= MAX_PARALLEL_PROCESSES_COUNT) {
             pcntl_waitpid(array_shift($tasks), $status);
             // TODO: check for exceptions, log exception and/or stop processing
@@ -164,19 +163,19 @@ function seed(): void
     $mysqli = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE);
     $data = mysqli_query($mysqli, "SELECT count(*) cnt  FROM users");
     $row = mysqli_fetch_assoc($data);
-    if ($row['cnt']>0) {
+    if ($row['cnt'] > 0) {
         echo "Database not empty, seed skipped\n";
         return;
     }
 
-    for ($i=1; $i<SEED_SIZE_HUNDREDS_ROWS; $i++) {
+    for ($i = 1; $i < SEED_SIZE_HUNDREDS_ROWS; $i++) {
         $values = [];
-        for ($r=1; $r<100; $r++) {
-            $confirmed = (int)(random_int(1,100) <= 15);
-            $time = date('Y-m-d h:i:s', time()+60*60*24*random_int(1,5));
+        for ($r = 1; $r < 100; $r++) {
+            $confirmed = (int)(random_int(1, 100) <= 15);
+            $time = date('Y-m-d h:i:s', time() + 60 * 60 * 24 * random_int(1, 5));
             $values[] = "('user_{$i}_{$r}','user_{$i}_{$r}@example.com','{$time}',{$confirmed})";
         }
-        $values = implode(',',$values);
+        $values = implode(',', $values);
 
         mysqli_query($mysqli, "INSERT INTO users (username, email, validts, confirmed) VALUES {$values}");
     }
