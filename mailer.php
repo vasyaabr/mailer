@@ -94,9 +94,9 @@ function send(): void
     // get list for sending
     $mysqli = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE);
     $list = mysqli_query($mysqli, "
-        SELECT U.id, email, username, U.validts
+        SELECT U.id, email, username, U.validts, TIMESTAMPDIFF(DAY,now(),U.validts) daysleft
         FROM users U
-        LEFT JOIN mails M USING (id, validts)
+        LEFT JOIN mails M ON U.id=M.id AND U.validts=M.validts AND M.daysleft=TIMESTAMPDIFF(DAY,now(),U.validts)
         WHERE TIMESTAMPDIFF(DAY,now(),U.validts) IN (1,3) AND valid=1 AND M.validts IS NULL 
           ");
 
@@ -105,7 +105,7 @@ function send(): void
         send_email(FROM_EMAIL, $row['email'], $message);
 
         $mysqli = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE);
-        mysqli_query($mysqli, "INSERT INTO mails VALUES ({$row['id']},'{$row['validts']}')");
+        mysqli_query($mysqli, "INSERT INTO mails VALUES ({$row['id']},'{$row['validts']}', {$row['daysleft']})");
 
         mysqli_close($mysqli);
     }

@@ -20,5 +20,6 @@ CREATE TABLE `users` (
 CREATE TABLE `mails` (
     `id` bigint unsigned NOT NULL,
     `validts` timestamp,
-    PRIMARY KEY (`id`)
+    `daysleft` int,
+    PRIMARY KEY (`id`, `validts`, `daysleft`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
