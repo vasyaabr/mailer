@@ -1,0 +1,2 @@
+*/1 * * * *     /usr/bin/flock -n /tmp/mailer-validate.lockfile /usr/bin/php /home/vasyaabr/mailer/mailer.php validate >/tmp/mailer.log
+*/1 * * * *     /usr/bin/flock -n /tmp/mailer-send.lockfile /usr/bin/php /home/vasyaabr/mailer/mailer.php send >/tmp/mailer.log

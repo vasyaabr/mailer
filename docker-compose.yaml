@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  mysql-mailer:
+    platform: linux/x86_64
+    container_name: mysql-mailer
+    image: mysql:5.7.32
+    volumes:
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - MYSQL_DATABASE=main
+      - MYSQL_USER=mainuser
+      - MYSQL_ROOT_PASSWORD=p@ssw0rd
+      - MYSQL_PASSWORD=p@ssw0rd
+    ports:
+      - "3306:3306"
+    networks:
+      - mailer-net
+
+
+networks:
+  mailer-net:
+    name: mailer-net
